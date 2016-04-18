@@ -12,18 +12,10 @@ import com.mf.shop.domain._
 
 object CartCheckoutApp extends App {
   
+  //Load prices from external source
   def loadPrices() : PriceList = 
   {
-     /*val config = ConfigFactory.load()
-     val list : Iterable[ConfigObject] = config.getObjectList("priceList").asScala
-    (for {
-      item : ConfigObject <- list
-      entry : Entry[String, ConfigValue] <- item.entrySet().asScala
-      key = entry.getKey
-      uri = Set(entry.getValue.unwrapped().toString())
-    } yield (key, uri)).toMap*/
-    
-    //just use hard coded list
+   //just use hard coded list
    val prices = Map("Orange" -> Set("1x0.25","3x0.5"), "Apple" -> Set("1x0.6","2x0.6"))
     .mapValues( offers => createOffersFromStrings(offers)) 
     
@@ -39,7 +31,7 @@ object CartCheckoutApp extends App {
     Console.println("started with prices : "+priceList)
     Console.println("elements in your Cart : "+args.mkString(","))
     
-    val pricedCart = CartPricer.checkOutCart(new Cart(args), priceList)
+    val pricedCart = CartPricer.checkOutCart(Cart.fromArrayOfStrings(args), priceList)
     
     Console.println("Output : "+pricedCart)
    

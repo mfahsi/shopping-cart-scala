@@ -1,5 +1,10 @@
 package com.mf.shop.service
-import com.mf.shop.domain._
+
+import scala.annotation.tailrec
+
+import com.mf.shop.domain.CartItem
+import com.mf.shop.domain.ItemOffer
+import com.mf.shop.domain.PricedCartItem
 
 trait ItemPricer {
   
@@ -7,8 +12,9 @@ trait ItemPricer {
 
       new PricedCartItem(item, priceOneItemWithChoiceOfOffersRec(item.quantity, offers.sortBy { x => x.quantity }.reverse, 0))
     }
-
-    def priceOneItemWithChoiceOfOffersRec(remaining: Int, offers: List[ItemOffer], price: Double): Double = {
+    
+    @tailrec
+    final def priceOneItemWithChoiceOfOffersRec(remaining: Int, offers: List[ItemOffer], price: Double): Double = {
       //assume best offer for large quantity
       if (remaining == 0) {
         price

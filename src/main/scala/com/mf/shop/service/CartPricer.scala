@@ -1,12 +1,17 @@
 package com.mf.shop.service
-import scala.collection.SortedSet
-import com.mf.shop.domain._
+
+import com.mf.shop.domain.Cart
 import com.mf.shop.domain.CartItemWithCheckedPrice
+import com.mf.shop.domain.NotPricedCartItem
+import com.mf.shop.domain.PriceList
+import com.mf.shop.domain.PricedCart
+import com.mf.shop.domain.PricedCartItem
 
 trait CartPricer {
 
   def checkOutCart(cart: Cart, priceList: PriceList): PricedCart = {
 
+    //utility function : find prices for cartitems
     def applyPricesToCartItems(cart: Cart, priceList: PriceList): Set[CartItemWithCheckedPrice] =
       {
         cart.items.map(item => priceList.offers get item.itemId match {
@@ -14,7 +19,7 @@ trait CartPricer {
           case Some(list) => ItemPricer.priceOneItemWithChoiceOfOffers(item, list.toList) 
         })
         
-      }
+     }
 
     //price returned is for PricedElements, NotPricedCartItem will have to be excluded from Cart
     def checkOutPricedItems(items: Set[PricedCartItem]): PricedCart =
@@ -22,6 +27,7 @@ trait CartPricer {
         new PricedCart(items, items.foldLeft(0.0)(_ + _.price))
       }
 
+    //first step CartItem -> PricedCartItem (or sometimes NotPricedCartItem)
     val pricedElements = applyPricesToCartItems(cart, priceList)
 
     //we assume all prices are available as config has Apple and Orange
