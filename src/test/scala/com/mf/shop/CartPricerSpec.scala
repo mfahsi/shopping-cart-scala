@@ -9,8 +9,10 @@ import com.mf.shop.domain._
 class CartPricerSpec extends WordSpecLike 
   with Matchers
 {
+
+  val priceListConfig :Map[String, Set[String]] = Map("Orange" -> Set("1x0.25","3x0.5"), "Apple" -> Set("1x0.6","2x0.6"))
   
-  val priceList :Map[String,String] = Map("Orange" -> "0.25", "Apple" -> "0.6")
+   val priceList :PriceList = new PriceList( priceListConfig.mapValues { x => CartCheckoutApp.createOffersFromStrings(x) })
   
   "CartPricer" should {
   
@@ -33,6 +35,20 @@ class CartPricerSpec extends WordSpecLike
    "price two oranges and one apple from config price source" in {
        val pricedCart = CartPricer.checkOutCart(new Cart(Array("Orange","Apple","Orange")), priceList)
        assert(pricedCart.totalPrice == 1.1)
+    }
+   
+    "price use buy one get one free on apples " in {
+      val pricedCart = CartPricer.checkOutCart(new Cart(Array("Apple","Apple")), priceList)
+       assert(pricedCart.totalPrice == 0.6)
+       val pricedCart2 = CartPricer.checkOutCart(new Cart(Array("Apple","Apple","Apple")), priceList)
+       assert(pricedCart2.totalPrice == 1.2)
+    }
+    
+    "price use 3 for price of 2 on oranges " in {
+       val pricedCart = CartPricer.checkOutCart(new Cart(Array("Orange","Orange")), priceList)
+       assert(pricedCart.totalPrice == 0.5)
+       val pricedCart2 = CartPricer.checkOutCart(new Cart(Array("Orange","Orange","Orange")), priceList)
+       assert(pricedCart2.totalPrice == 0.5)
     }
   
   }
